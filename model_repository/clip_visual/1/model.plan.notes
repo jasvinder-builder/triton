@@ -1,0 +1,9 @@
+Download ONNX model from here: 
+https://github.com/Lednik7/CLIP-ONNX/tree/main
+!wget https://clip-as-service.s3.us-east-2.amazonaws.com/models/onnx/ViT-B-32/visual.onnx
+
+and then convert to tensorRT plan following similar instructions to YOLOV7 and copy in this directory as `model.plan`.
+
+./tensorrt/bin/trtexec --onnx=/data/vit-b32/visual.onnx --minShapes=input:1x3x224x224 --optShapes=input:32x3x224x224 --maxShapes=input:256x3x224x224 --fp16 --workspace=4096 --saveEngine=/data/vit-b32/visual256.plan
+./tensorrt/bin/trtexec --loadEngine=/data/vit-b32/visual256.plan
+

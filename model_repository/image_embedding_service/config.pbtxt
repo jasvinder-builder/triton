@@ -1,0 +1,44 @@
+name: "image_embedding_service"
+platform: "ensemble"
+input [
+  {
+    name: "image"
+    data_type: TYPE_UINT8
+    dims: [-1, -1]
+  }
+]
+output [
+  {
+    name: "embedding"
+    data_type: TYPE_FP32
+    dims: [512]
+  }
+]
+ensemble_scheduling {
+  step [
+    {
+      model_name: "clip_preprocess"
+      model_version: 1
+      input_map {
+        key: "image"
+        value: "image"
+      }
+      output_map {
+        key: "preprocessed"
+        value: "preprocessed_image"
+      }
+    },
+    {
+      model_name: "clip_visual"
+      model_version: 1
+      input_map {
+        key: "input"
+        value: "preprocessed_image"
+      }
+      output_map {
+        key: "output"
+        value: "embedding"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+Get yolov7 ONNX model and convert to tensorrt plan using instructions here:
+https://github.com/WongKinYiu/yolov7/tree/main/deploy/triton-inference-server

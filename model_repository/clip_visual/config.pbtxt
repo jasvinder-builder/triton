@@ -1,0 +1,4 @@
+name: "clip_visual"
+platform: "tensorrt_plan"
+max_batch_size: 256
+dynamic_batching { }

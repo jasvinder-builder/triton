@@ -1,0 +1,52 @@
+infer_config {
+  unique_id: 1
+  gpu_ids: [0]
+  max_batch_size: 1
+  backend {
+    inputs: [ {
+      name: "input.1"
+      dims: [3, 480, 640]
+    }]
+    triton {
+      model_name: "centerface"
+      version: 1
+      grpc {
+        url: "localhost:8001"
+        enable_cuda_buffer_sharing: true
+      }
+    }
+  }
+
+preprocess {
+    network_format: IMAGE_FORMAT_RGB
+    tensor_order: TENSOR_ORDER_LINEAR
+    maintain_aspect_ratio: 0
+    normalize {
+      scale_factor: 1.0
+      channel_offsets: [0, 0, 0]
+    }
+  }
+
+  postprocess {
+    labelfile_path: "centerface_labels.txt"
+    detection {
+      num_detected_classes: 1
+      custom_parse_bbox_func: "NvDsInferParseCustomCenterNetFace"
+      simple_cluster {
+        threshold: 0.3
+      }
+    }
+  }
+
+  custom_lib {
+    path: "../customparser/libnvds_infercustomparser_centernet.so"
+  }
+
+  extra {
+    copy_input_to_host_buffers: false
+  }
+}
+input_control {
+  process_mode: PROCESS_MODE_FULL_FRAME
+  interval: 0
+}
