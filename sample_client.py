@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-import cv2
-import numpy as np
-import sys
-
 from functools import partial
-from pathlib import Path
+import sys
 import queue
+import numpy as np
 
-from PIL import Image
 
 import tritonclient.grpc as grpcclient
 from tritonclient.utils import InferenceServerException
@@ -17,24 +13,25 @@ from tritonclient.utils import InferenceServerException
 INPUT_NAMES = ["video"]
 OUTPUT_NAMES = ["embeddings", "snippets"]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('input',
-                        type=str,
-                        nargs='?',
-                        help='Input video file')
-    parser.add_argument('-m',
-                        '--model',
-                        type=str,
-                        required=False,
-                        default='video_grid_processing_service',
-                        help='Inference model name, default: video_grid_processing_service')
-    parser.add_argument('-u',
-                        '--url',
-                        type=str,
-                        required=False,
-                        default='localhost:8001',
-                        help='Inference server URL, default localhost:8001')
+    parser.add_argument("input", type=str, nargs="?", help="Input video file")
+    parser.add_argument(
+        "-m",
+        "--model",
+        type=str,
+        required=False,
+        default="video_grid_processing_service",
+        help="Inference model name, default: video_grid_processing_service",
+    )
+    parser.add_argument(
+        "-u",
+        "--url",
+        type=str,
+        required=False,
+        default="localhost:8001",
+        help="Inference server URL, default localhost:8001",
+    )
 
     FLAGS = parser.parse_args()
 
@@ -46,7 +43,8 @@ if __name__ == '__main__':
             ssl=False,
             root_certificates=None,
             private_key=None,
-            certificate_chain=None)
+            certificate_chain=None,
+        )
     except Exception as e:
         print("context creation failed: " + str(e))
         sys.exit()
@@ -66,11 +64,12 @@ if __name__ == '__main__':
 
     # Queue for results
     completed_requests = queue.Queue()
-    def callback(queue, result, error):
-        if error:
-            queue.put(error)
+
+    def callback(q, res, err):
+        if err:
+            q.put(err)
         else:
-            queue.put(result)
+            q.put(res)
 
     triton_client.start_stream(callback=partial(callback, completed_requests))
 
@@ -85,14 +84,20 @@ if __name__ == '__main__':
     for i in range(len(OUTPUT_NAMES)):
         outputs.append(grpcclient.InferRequestedOutput(OUTPUT_NAMES[i]))
 
-    triton_client.async_stream_infer(model_name=FLAGS.model, inputs=inputs, request_id="0", outputs=outputs, enable_empty_final_response=True)
+    triton_client.async_stream_infer(
+        model_name=FLAGS.model,
+        inputs=inputs,
+        request_id="0",
+        outputs=outputs,
+        enable_empty_final_response=True,
+    )
 
     while True:
         result = completed_requests.get()
         if type(result) == InferenceServerException:
             raise result
         response = result.get_response()
-        if response.parameters.get('triton_final_response').bool_param:
+        if response.parameters.get("triton_final_response").bool_param:
             break
         embeddings = result.as_numpy(OUTPUT_NAMES[0])
         snippets = result.as_numpy(OUTPUT_NAMES[1])
