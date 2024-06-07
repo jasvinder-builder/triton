@@ -1,20 +1,8 @@
 # Steps:
-#  git clone https://github.com/triton-inference-server/dali_backend.git
+#  git clone --recursive https://github.com/triton-inference-server/dali_backend.git
 #  modify the Dockerfile.release as below and then build the docker image
 
-diff --git a/docker/Dockerfile.release b/docker/Dockerfile.release
-index 00dc3dd..1684d09 100644
---- a/docker/Dockerfile.release
-+++ b/docker/Dockerfile.release
-@@ -79,6 +79,9 @@ RUN MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py310_24.1.2-0
-     find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-     /opt/conda/bin/conda clean -afy
-
-+RUN /opt/conda/bin/conda install -y numpy scipy protobuf && \
-+    /opt/conda/bin/pip install opencv-python-headless Pillow torch torchvision tqdm
+ RUN pip3 install -U pip
++RUN pip install opencv-python-headless numpy scipy Pillow torch torchvision tqdm
 +
-+RUN /opt/conda/bin/conda install -c conda-forge cupy cudnn cutensor nccl
-+
- WORKDIR /dali
-
- ARG DALI_DOWNLOAD_EXTRA_INDEX_URL
+ WORKDIR /opt
