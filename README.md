@@ -26,7 +26,7 @@ using a mix of CPU and GPU](https://docs.nvidia.com/deeplearning/dali/user-guide
 - Get a GPU machine with nvidia drivers installed (example: 192.168.11.91)
 - Sample run command:
 ```
-docker run --gpus=all --shm-size=6g --rm --net=host --ipc=host -p8000:8000 -p8001:8001 -p8002:8002 -v /home/jasvindersingh/work/triton/model_repository/:/models my-triton-dali tritonserver --cuda-memory-pool-byte-size 0:8589934592 --model-repository=/models
+docker run --gpus=all --shm-size=6g --rm --net=host --ipc=host -p8000:8000 -p8001:8001 -p8002:8002 -v /home/jasvinder/work/triton/model_repository/:/models my-triton-dali tritonserver --cuda-memory-pool-byte-size 0:8589934592 --model-repository=/models
 ```
 - [WIP] Add more notes
 
@@ -40,7 +40,7 @@ docker run --gpus=all --shm-size=6g --rm --net=host --ipc=host -p8000:8000 -p800
 
 ## Deepstream
 - Deepstream is running as a separate docker and [acting as a triton-client](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_plugin_gst-nvinferserver.html#deepstream-triton-grpc-support) communicating with the triton-server which is serving a lightweight face detection [centerface](https://github.com/jasvinder-builder/triton/tree/master/model_repository/centerface) model.
-- Starting deepstream: ```docker run --gpus "device=0" -it --net=host -p 8554:8554 --rm -v /home/jasvindersingh/work/triton:/my_triton -e CUDA_CACHE_DISABLE=0 my-deepstream7 ```
+- Starting deepstream: ```docker run --gpus "device=0" -it --net=host -p 8554:8554 --rm -v /home/jasvinder/work/triton:/my_triton -e CUDA_CACHE_DISABLE=0 my-deepstream7 ```
 - Running the deepstream app from inside the above docker: ```deepstream-app -c /my_triton/deepstream/config/app_config.txt ``` (output gets stored as *out.mp4* inside the config folder, but can also be served as an RTSP stream).
 - Also, we can change the source in the app_config.txt to an RTSP stream as well.
 - [WIP] Instead of simply displaying the output, if we want to do something more interesting like live `CLIP queries based detection`, then we need to add probes and get access to the returned inference metadata, something along the lines of [this](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps/blob/8178b5e611ccdc23bef39caf2f1f07b14d39a7cb/apps/deepstream-ssd-parser/deepstream_ssd_parser.py#L264)
