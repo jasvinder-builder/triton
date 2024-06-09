@@ -65,11 +65,11 @@ if __name__ == "__main__":
     # Queue for results
     completed_requests = queue.Queue()
 
-    def callback(q, res, err):
-        if err:
-            q.put(err)
+    def callback(q, result, error):
+        if error:
+            q.put(error)
         else:
-            q.put(res)
+            q.put(result)
 
     triton_client.start_stream(callback=partial(callback, completed_requests))
 

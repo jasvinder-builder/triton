@@ -76,11 +76,11 @@ class ProcessingEngine:
         return embedding
 
     def process_video(self, video_file_path: str | Path, grid=False) -> Tuple:
-        def callback(q, res, err):
-            if err:
-                q.put(err)
+        def callback(q, result, error):
+            if error:
+                q.put(error)
             else:
-                q.put(res)
+                q.put(result)
 
         # Start the stream
         self.client.start_stream(callback=partial(callback, self.results))
